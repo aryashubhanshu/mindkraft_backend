@@ -259,6 +259,28 @@ export default {
         },
       },
     },
+    "/dashboard/metrics": {
+      get: {
+        summary: "Get dashboard metrics",
+        security: [{ BearerAuth: [] }],
+        responses: {
+          200: { description: "Dashboard metrics summary" },
+          403: { description: "Access denied: Insufficient permissions" },
+          500: { description: "Server error" },
+        },
+      },
+    },
+    "/dashboard/charts": {
+      get: {
+        summary: "Get chart data for the dashboard",
+        security: [{ BearerAuth: [] }],
+        responses: {
+          200: { description: "Chart data by assessment type" },
+          403: { description: "Access denied: Insufficient permissions" },
+          500: { description: "Server error" },
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {
