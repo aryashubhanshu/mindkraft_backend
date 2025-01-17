@@ -6,6 +6,7 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import assessmentRoutes from "./routes/assessmentRoutes.js";
 import statisticsRoutes from "./routes/statisticsRoutes.js";
+import invitationRoutes from "./routes/invitationRoutes.js";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/assessments", assessmentRoutes);
 app.use("/api/statistics", statisticsRoutes);
+app.use("/api/invitations", invitationRoutes);
 
 // MongoDB connection
 mongoose
