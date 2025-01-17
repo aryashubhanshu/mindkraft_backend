@@ -81,3 +81,32 @@ export const deleteAssessment = async (req, res) => {
     res.status(500).json({ message: "Error deleting assessment", error });
   }
 };
+
+// Record a submission
+export const recordSubmission = async (req, res) => {
+  try {
+    const { assessmentId } = req.params;
+    const userId = req.user.id; // User ID from middleware
+
+    const assessment = await Assessment.findById(assessmentId);
+    if (!assessment) {
+      res.status(404).json({ message: "Assessment not found" });
+    }
+
+    const alreadySubmitted = assessment.submissions.some(
+      (submission) => submission.userId.toString() === userId
+    );
+    if (alreadySubmitted) {
+      return res
+        .status(400)
+        .json({ message: "User has already submitted this assessment" });
+    }
+
+    assessment.submissions.push({ userId, submittedAt: new Date() });
+    await assessment.save();
+
+    res.status(201).json({ message: "Submission recorded successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error recording submission", error });
+  }
+};
