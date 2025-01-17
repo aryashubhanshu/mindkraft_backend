@@ -5,6 +5,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/authRoutes.js";
 import assessmentRoutes from "./routes/assessmentRoutes.js";
+import statisticsRoutes from "./routes/statisticsRoutes.js";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/assessments", assessmentRoutes);
+app.use("/api/statistics", statisticsRoutes);
 
 // MongoDB connection
 mongoose

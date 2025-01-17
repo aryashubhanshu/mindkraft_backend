@@ -18,6 +18,14 @@ const assessmentSchema = new mongoose.Schema({
     required: true,
   },
   createdAt: { type: Date, default: Date.now },
+
+  // Submissions
+  submissions: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      submittedAt: { type: Date, default: Date.now },
+    },
+  ],
 });
 
 export default mongoose.model("Assessment", assessmentSchema);
