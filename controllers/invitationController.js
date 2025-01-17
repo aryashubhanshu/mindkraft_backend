@@ -5,6 +5,8 @@ import csvParser from "csv-parser";
 import Assessment from "../models/Assessment.js";
 import Invitation from "../models/Invitation.js";
 
+import sendEmail from "../utils/emailService.js";
+
 // Configuring multer for file upload
 const uplaod = multer({ dest: "uploads/" }); // Temporary folder to store uploaded files
 
@@ -24,9 +26,9 @@ export const sendInvitations = async (req, res) => {
       invitation = new Invitation({ assessmentId, users: [] });
     }
 
-    // TODO: Send email to users with the assessment link
     users.forEach((email) => {
       if (!invitation.users.some((user) => user.email === email)) {
+        // TODO: Send email with the assessment link
         invitation.users.push({ email });
       }
     });
@@ -90,6 +92,7 @@ export const bulkUploadInvitations = [
           // Add users to the invitation list
           users.forEach((user) => {
             if (!invitation.users.some((u) => u.email === user.email)) {
+              // TODO: Send email with the assessment link
               invitation.users.push(user);
             }
           });
