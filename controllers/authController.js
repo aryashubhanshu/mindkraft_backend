@@ -30,7 +30,9 @@ export const login = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user || !(await user.isPasswordValid(password))) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      const error = new Error("Invalid username or password");
+      error.statusCode = 401;
+      return next(error);
     }
 
     const token = jwt.sign(
@@ -43,6 +45,6 @@ export const login = async (req, res) => {
 
     res.json({ token });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    next(error);
   }
 };

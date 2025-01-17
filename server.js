@@ -1,24 +1,28 @@
 import express from "express";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import cors from "cors";
+import morgan from "morgan";
+import dotenv from "dotenv-safe";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "./swagger.js";
 
-import authRoutes from "./routes/authRoutes.js";
-import assessmentRoutes from "./routes/assessmentRoutes.js";
-import statisticsRoutes from "./routes/statisticsRoutes.js";
-import invitationRoutes from "./routes/invitationRoutes.js";
+import routes from "./routes/index.js";
 
-dotenv.config();
+import errorMiddleware from "./middlewares/errorMiddleware.js";
+
+dotenv.config({
+  example: "./.env.example",
+});
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use(morgan("dev"));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use("/api/auth", authRoutes);
-app.use("/api/assessments", assessmentRoutes);
-app.use("/api/statistics", statisticsRoutes);
-app.use("/api/invitations", invitationRoutes);
+app.use("/api", routes);
+app.use(errorMiddleware);
 
 // MongoDB connection
 mongoose
