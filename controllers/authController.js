@@ -23,7 +23,7 @@ export const register = async (req, res) => {
 };
 
 // User login
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   const { username, password } = req.body;
 
   try {
@@ -36,7 +36,7 @@ export const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, username: user.username, role: user.role },
       process.env.JWT_SECRET,
       {
         expiresIn: "1d",
