@@ -9,7 +9,7 @@ const invitationSchema = new mongoose.Schema({
   users: [
     {
       email: { type: String, required: true },
-      firstName: { type: String, required: true },
+      firstName: { type: String },
       lastName: { type: String },
       phone: { type: String },
       status: { type: String, default: "invited" }, // invited or submitted
