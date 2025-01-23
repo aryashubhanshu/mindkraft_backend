@@ -60,7 +60,7 @@ export const getInvitations = async (req, res) => {
 
     if (!invitation) {
       return res
-        .status(404)
+        .status(204)
         .json({ message: "No invitations found for this assessment" });
     }
 
