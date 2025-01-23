@@ -14,7 +14,7 @@ const uplaod = multer({ dest: "uploads/" }); // Temporary folder to store upload
 export const sendInvitations = async (req, res) => {
   try {
     const { assessmentId } = req.params;
-    const { users } = req.body; // Array of user emails
+    const { users } = req.body; // Array of user object (email, firstName, lastName, phone)
 
     const assessment = await Assessment.findById(assessmentId);
     if (!assessment) {
@@ -26,10 +26,20 @@ export const sendInvitations = async (req, res) => {
       invitation = new Invitation({ assessmentId, users: [] });
     }
 
-    users.forEach((email) => {
+    users.forEach(({ email, firstName, lastName, phone }) => {
       if (!invitation.users.some((user) => user.email === email)) {
-        // TODO: Send email with the assessment link
-        invitation.users.push({ email });
+        // Add user if the email does not already exist
+        invitation.users.push({
+          email,
+          firstName,
+          lastName,
+          phone,
+          status: "invited",
+          invitedAt: new Date(),
+        });
+
+        // TODO: Send email with the assessment link (Optional)
+        console.log(`Invitation sent to ${email}`);
       }
     });
 
