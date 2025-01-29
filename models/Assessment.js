@@ -8,8 +8,12 @@ const assessmentSchema = new mongoose.Schema({
   questions: [
     {
       text: { type: String, required: true },
-      options: [{ type: String, required: true }], // e.g. ["Option 1", "Option 2", "Option 3", "Option 4"]
-      weightage: { type: Number, default: 1 }, // Marks (optional)
+      options: [
+        {
+          text: { type: String, required: true },
+          weightage: { type: Number, required: true },
+        },
+      ], // e.g. ["Option 1", "Option 2", "Option 3", "Option 4"]
     },
   ],
   createdBy: {
