@@ -48,6 +48,41 @@ export const getAssessmentById = async (req, res) => {
   }
 };
 
+// Get a specific assessment by ID (for user)
+export const getTestById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id; // Assuming user ID is available from auth middleware
+
+    // Find the assessment by ID
+    const assessment = await Assessment.findById(id);
+
+    if (!assessment) {
+      return res.status(404).json({ message: "Assessment not found" });
+    }
+
+    // Check if the user has already submitted this assessment
+    const hasSubmitted = assessment.submissions.some(
+      (sub) => sub.userId.toString() === userId
+    );
+
+    if (hasSubmitted) {
+      return res.status(200).json({
+        message: "You have already completed this assessment.",
+        submitted: true,
+      });
+    }
+
+    // If not submitted, return the assessment details
+    res.status(200).json({
+      submitted: false,
+      assessment,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching assessment", error });
+  }
+};
+
 // Update an assessment
 export const updateAssessment = async (req, res) => {
   try {
