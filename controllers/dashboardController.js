@@ -7,12 +7,9 @@ export const getDashboardMetrics = async (req, res, next) => {
   try {
     const userId = req.user.id;
 
-    // Get timestamps for filtering
+    // Get timestamp for last month filtering
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-    const lastDay = new Date();
-    lastDay.setDate(lastDay.getDate() - 1);
 
     // Fetch assessments created by user
     const assessments = await Assessment.find(
@@ -25,14 +22,14 @@ export const getDashboardMetrics = async (req, res, next) => {
       (a) => a.createdAt >= lastMonth
     ).length;
 
-    // Count total submissions and last day submissions
+    // Count total submissions and last month submissions
     let totalSubmissions = 0;
-    let lastDaySubmissions = 0;
+    let lastMonthSubmissions = 0;
 
     assessments.forEach((assessment) => {
       totalSubmissions += assessment.submissions.length;
-      lastDaySubmissions += assessment.submissions.filter(
-        (s) => s.submittedAt >= lastDay
+      lastMonthSubmissions += assessment.submissions.filter(
+        (s) => s.submittedAt >= lastMonth
       ).length;
     });
 
@@ -55,7 +52,7 @@ export const getDashboardMetrics = async (req, res, next) => {
       totalAssessments,
       assessmentsChange: lastMonthAssessments, // Change from last month
       totalSubmissions,
-      submissionsChange: lastDaySubmissions, // Change from last day
+      submissionsChange: lastMonthSubmissions, // Change from last month
       totalInvitations,
       invitationsChange: lastMonthInvitations, // Change from last month
     });
