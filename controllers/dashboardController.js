@@ -65,26 +65,61 @@ export const getDashboardMetrics = async (req, res, next) => {
 export const getChartData = async (req, res, next) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.id);
+    const { timeRange } = req.query;
+
+    // Calculate date range based on timeRange
+    let startDate;
+    const today = new Date();
+
+    switch (timeRange) {
+      case "7d":
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 7);
+        break;
+      case "15d":
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 15);
+        break;
+      case "1m":
+        startDate = new Date();
+        startDate.setMonth(today.getMonth() - 1);
+        break;
+      case "3m":
+        startDate = new Date();
+        startDate.setMonth(today.getMonth() - 3);
+        break;
+      case "6m":
+        startDate = new Date();
+        startDate.setMonth(today.getMonth() - 6);
+        break;
+      case "all":
+      default:
+        startDate = null; // No filtering for "Overall"
+        break;
+    }
+
+    const matchStage = { createdBy: userId };
+    if (startDate) matchStage.createdAt = { $gte: startDate };
 
     // Count by Type
     const typesData = await Assessment.aggregate([
-      { $match: { createdBy: userId } }, // Match assessments created by the user
+      { $match: matchStage },
       {
         $group: {
-          _id: "$type", // Group by the "type" field
-          count: { $sum: 1 }, // Count the number of assessments of each type
+          _id: "$type",
+          count: { $sum: 1 },
         },
       },
     ]);
 
     // Count by User Group
     const userGroupsData = await Assessment.aggregate([
-      { $match: { createdBy: userId } }, // Match assessments created by the user
-      { $unwind: "$userGroup" }, // Unwind the array of user groups
+      { $match: matchStage },
+      { $unwind: "$userGroup" },
       {
         $group: {
-          _id: "$userGroup", // Group by each user group value
-          count: { $sum: 1 }, // Count the number of occurrences for each user group
+          _id: "$userGroup",
+          count: { $sum: 1 },
         },
       },
     ]);
