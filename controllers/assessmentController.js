@@ -122,6 +122,7 @@ export const recordSubmission = async (req, res) => {
   try {
     const { assessmentId } = req.params;
     const userId = req.user.id; // User ID from middleware
+    const { answers } = req.body;
 
     const assessment = await Assessment.findById(assessmentId);
     if (!assessment) {
@@ -137,11 +138,59 @@ export const recordSubmission = async (req, res) => {
         .json({ message: "User has already submitted this assessment" });
     }
 
-    assessment.submissions.push({ userId, submittedAt: new Date() });
+    if (!answers || answers.length !== assessment.questions.length) {
+      return res
+        .status(400)
+        .json({ message: "All questions must be answered." });
+    }
+
+    assessment.submissions.push({ userId, answers, submittedAt: new Date() });
     await assessment.save();
 
     res.status(201).json({ message: "Submission recorded successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error recording submission", error });
+  }
+};
+
+export const getUserSubmission = async (req, res) => {
+  try {
+    const { assessmentId, userId } = req.params; // Get assessmentId and userId from request params
+
+    // Find the assessment along with the user's submission
+    const assessment = await Assessment.findById(assessmentId);
+    if (!assessment) {
+      return res.status(404).json({ message: "Assessment not found" });
+    }
+
+    // Find the user's submission
+    const submission = assessment.submissions.find(
+      (sub) => sub.userId.toString() === userId
+    );
+
+    if (!submission) {
+      return res
+        .status(404)
+        .json({ message: "Submission not found for this user" });
+    }
+
+    // Structure response to include questions, options, and user's selected answers
+    const formattedQuestions = assessment.questions.map((question, index) => ({
+      text: question.text,
+      options: question.options.map((option) => ({
+        text: option.text,
+        weightage: option.weightage,
+      })),
+      selectedAnswer: submission.answers[index] || null, // Fetch user's selected answer
+    }));
+
+    res.status(200).json({
+      assessmentName: assessment.name,
+      userId,
+      submittedAt: submission.submittedAt,
+      questions: formattedQuestions,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user submission", error });
   }
 };

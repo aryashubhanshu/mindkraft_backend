@@ -27,6 +27,7 @@ const assessmentSchema = new mongoose.Schema({
   submissions: [
     {
       userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      answers: [{ type: String, required: true }],
       submittedAt: { type: Date, default: Date.now },
     },
   ],

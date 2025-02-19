@@ -8,6 +8,7 @@ import {
   deleteAssessment,
   recordSubmission,
   getTestById,
+  getUserSubmission,
 } from "../controllers/assessmentController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
@@ -45,5 +46,12 @@ router.get(
 );
 
 router.post("/:assessmentId/submit", authMiddleware, recordSubmission);
+
+router.get(
+  "/:assessmentId/submission/:userId",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  getUserSubmission
+);
 
 export default router;
