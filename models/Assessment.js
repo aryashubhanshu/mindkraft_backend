@@ -27,8 +27,13 @@ const assessmentSchema = new mongoose.Schema({
   submissions: [
     {
       userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      answers: [{ type: String, required: true }],
+      answers: [{ type: String }],
       submittedAt: { type: Date, default: Date.now },
+      status: {
+        type: String,
+        enum: ["submitted", "incomplete"],
+        required: true,
+      },
     },
   ],
 });

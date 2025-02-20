@@ -62,14 +62,19 @@ export const getTestById = async (req, res) => {
     }
 
     // Check if the user has already submitted this assessment
-    const hasSubmitted = assessment.submissions.some(
+    const userSubmission = assessment.submissions.find(
       (sub) => sub.userId.toString() === userId
     );
 
-    if (hasSubmitted) {
+    if (userSubmission) {
+      const message =
+        userSubmission.status === "incomplete"
+          ? "Time's up! Your test was auto-submitted as incomplete."
+          : "You have already completed this assessment.";
       return res.status(200).json({
-        message: "You have already completed this assessment.",
+        message,
         submitted: true,
+        status: userSubmission.status,
       });
     }
 
@@ -122,7 +127,7 @@ export const recordSubmission = async (req, res) => {
   try {
     const { assessmentId } = req.params;
     const userId = req.user.id; // User ID from middleware
-    const { answers } = req.body;
+    const { answers, isTimeUp = false } = req.body;
 
     const assessment = await Assessment.findById(assessmentId);
     if (!assessment) {
@@ -138,16 +143,21 @@ export const recordSubmission = async (req, res) => {
         .json({ message: "User has already submitted this assessment" });
     }
 
-    if (!answers || answers.length !== assessment.questions.length) {
-      return res
-        .status(400)
-        .json({ message: "All questions must be answered." });
-    }
+    // Determine status based on whether answers were provided
+    const status =
+      answers && answers.length === assessment.questions.length && !isTimeUp
+        ? "submitted"
+        : "incomplete";
 
-    assessment.submissions.push({ userId, answers, submittedAt: new Date() });
+    assessment.submissions.push({
+      userId,
+      answers: answers || [],
+      status,
+      submittedAt: new Date(),
+    });
     await assessment.save();
 
-    res.status(201).json({ message: "Submission recorded successfully" });
+    res.status(201).json({ message: `Submission recorded as ${status}` });
   } catch (error) {
     res.status(500).json({ message: "Error recording submission", error });
   }
