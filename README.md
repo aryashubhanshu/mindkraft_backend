@@ -56,3 +56,9 @@ npm run dev
 ```
 
 The server should now be running on `http://localhost:3001`.
+
+### 📄 API Documentation (Swagger)
+
+To view the API documentation, visit `http://localhost:3001/api-docs`.
+
+This will open the Swagger UI, where you can explore the available endpoints and test them.

@@ -204,6 +204,83 @@ export default {
         },
       },
     },
+    "/assessments/test/{id}": {
+      get: {
+        summary: "Get test details",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: { description: "Test details" },
+          404: { description: "Not found" },
+          500: { description: "Server error" },
+        },
+      },
+    },
+    "/assessments/{assessmentId}/submit": {
+      post: {
+        summary: "Submit an assessment",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "assessmentId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  answers: { type: "array", items: { type: "string" } },
+                },
+                required: ["answers"],
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Submission recorded" },
+          400: { description: "Invalid submission" },
+          500: { description: "Server error" },
+        },
+      },
+    },
+    "/assessments/{assessmentId}/submission/{userId}": {
+      get: {
+        summary: "Get a user's submission (Admin only)",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "assessmentId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+          {
+            name: "userId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: { description: "User submission details" },
+          404: { description: "Not found" },
+          500: { description: "Server error" },
+        },
+      },
+    },
     "/statistics/{assessmentId}": {
       get: {
         summary: "Get statistics for an assessment (Admin only)",
